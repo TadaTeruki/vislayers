@@ -1,14 +1,14 @@
 pub struct SimpleColorMap {
-    colors: Vec<[f32; 3]>,
-    thresholds: Vec<f32>,
+    colors: Vec<[f64; 3]>,
+    thresholds: Vec<f64>,
 }
 
 impl SimpleColorMap {
-    pub fn new(colors: Vec<[f32; 3]>, thresholds: Vec<f32>) -> Self {
+    pub fn new(colors: Vec<[f64; 3]>, thresholds: Vec<f64>) -> Self {
         SimpleColorMap { colors, thresholds }
     }
 
-    pub fn get_color(&self, value: f32) -> [f32; 3] {
+    pub fn get_color(&self, value: f64) -> [f64; 3] {
         if value < self.thresholds[0] {
             return self.colors[0];
         }
@@ -21,7 +21,7 @@ impl SimpleColorMap {
                     .iter()
                     .zip(self.colors[i].iter())
                     .map(|(&c1, &c2)| c1 + ratio * (c2 - c1))
-                    .collect::<Vec<f32>>();
+                    .collect::<Vec<f64>>();
                 return [color[0], color[1], color[2]];
             }
         }

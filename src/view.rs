@@ -28,6 +28,10 @@ impl ViewState {
         }
     }
 
+    pub fn focus_range(&self) -> &FocusRange {
+        &self.focus_range
+    }
+
     pub fn zoom(&mut self, d_zoom_level: f64) {
         self.zoom_level += d_zoom_level * 0.25;
         self.focus_range.set_radius(2.0_f64.powf(self.zoom_level));
@@ -63,7 +67,7 @@ impl ViewState {
 
             let mut x = grid_start_x;
             while x <= grid_end_x {
-                let ix = rect.map_coord_x(x as f64, 0.0, area_width);
+                let ix = rect.map_coord_x(x, 0.0, area_width);
                 cr.move_to(ix, rect.map_coord_y(rect.min_y, 0.0, area_height));
                 cr.line_to(ix, rect.map_coord_y(rect.max_y, 0.0, area_height));
                 cr.stroke().expect("Error drawing grid");
@@ -75,7 +79,7 @@ impl ViewState {
 
             let mut y = grid_start_y;
             while y <= grid_end_y {
-                let iy = rect.map_coord_y(y as f64, 0.0, area_height);
+                let iy = rect.map_coord_y(y, 0.0, area_height);
                 cr.move_to(rect.map_coord_x(rect.min_x, 0.0, area_width), iy);
                 cr.line_to(rect.map_coord_x(rect.max_x, 0.0, area_width), iy);
                 cr.stroke().expect("Error drawing grid");
@@ -84,8 +88,7 @@ impl ViewState {
         }
     }
 
-    pub fn update(&mut self, drawing_area: &DrawingArea, cr: &Context) {
+    pub fn update(&mut self) {
         self.focus_range.update();
-        self.draw_grid(drawing_area, cr);
     }
 }
