@@ -6,6 +6,7 @@ pub struct ViewState {
     focus_range: FocusRange,
     zoom_level: f64,
     move_speed: f64,
+    zoom_speed: f64,
     grid_thresholds: Vec<f64>,
     grid_interval: f64,
 }
@@ -23,6 +24,7 @@ impl ViewState {
             focus_range: FocusRange::new(0.0, 0.0, 1.0, 0.01),
             zoom_level: 0.0,
             move_speed: 0.1,
+            zoom_speed: 0.5,
             grid_thresholds,
             grid_interval,
         }
@@ -33,7 +35,7 @@ impl ViewState {
     }
 
     pub fn zoom(&mut self, d_zoom_level: f64) {
-        self.zoom_level += d_zoom_level * 0.25;
+        self.zoom_level += d_zoom_level * self.zoom_speed;
         self.focus_range.set_radius(2.0_f64.powf(self.zoom_level));
     }
 
