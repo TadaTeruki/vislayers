@@ -15,17 +15,17 @@ struct TerrainMap {
 }
 
 impl TerrainMap {
-    fn new(file_path: &str) -> Self {
+    fn new(file_path: &str, sea_level: f64) -> Self {
         let particle_map =
             ParticleMap::<f64>::read_from_file(file_path).expect("Error reading terrain map");
         let num_thresholds = 80;
 
         let thresholds = (0..num_thresholds)
-            .map(|i| i as f64 * 0.9 / (num_thresholds - 1) as f64)
+            .map(|i| i as f64 * 0.9 / (num_thresholds - 1) as f64 + sea_level)
             .collect::<Vec<_>>();
 
         let bands = particle_map
-            .contours(
+            .isobands(
                 particle_map.corners(),
                 300000.0,
                 &thresholds,
@@ -63,7 +63,7 @@ impl Layer for TerrainMap {
 
         let bands_step = bands_step(focus_range);
 
-        for threshold in self.bands.iter().skip(1).step_by(bands_step) {
+        for threshold in self.bands.iter().step_by(bands_step) {
             cr.new_path();
             for polygon in &threshold.polygons {
                 for (i, point) in polygon.iter().enumerate().step_by(bands_step) {
@@ -142,10 +142,20 @@ impl Layer for DrainageMap {
                 cr.arc(x1, y1, 1.0, 0.0, 2.0 * std::f64::consts::PI);
                 cr.fill().expect("Failed to draw center point");
             } else {
-                cr.set_line_width(node.drainage_area.sqrt() / focus_range.radius() * 0.5);
+                let site_second_to = self
+                    .particle_map
+                    .get(&node.flow_to)
+                    .unwrap_or(&node)
+                    .flow_to
+                    .site();
+                let x3 = rect.map_coord_x(site_second_to.0, 0.0, area_width as f64);
+                let y3 = rect.map_coord_y(site_second_to.1, 0.0, area_height as f64);
+
+                cr.set_line_width(node.river_width(1.0) / focus_range.radius());
                 cr.set_source_rgb(0.0, 0.0, 1.0);
-                cr.move_to(x1, y1);
-                cr.line_to(x2, y2);
+                cr.move_to((x1 + x2) / 2.0, (y1 + y2) / 2.0);
+                cr.line_to((x2 + x3) / 2.0, (y2 + y3) / 2.0);
+                cr.set_line_cap(gtk4::cairo::LineCap::Round);
                 cr.stroke().expect("Failed to draw edge");
             }
         }
@@ -153,7 +163,7 @@ impl Layer for DrainageMap {
 }
 
 fn main() {
-    let terrain_map = TerrainMap::new("./data/11008264925851530191.particlemap");
+    let terrain_map = TerrainMap::new("./data/11008264925851530191.particlemap", 0.0025);
     let drainage_map = DrainageMap::from_terrain_map(&terrain_map);
 
     let mut visualizer = Visualizer::new(800, 600);
