@@ -104,7 +104,7 @@ dependencies = [
 [[package]]
 name = "drainage-basin-builder"
 version = "0.1.0"
-source = "git+https://github.com/TadaTeruki/drainage-basin-builder#8e8ca8712af6320c7f881460f571cdc1a1c0f63c"
+source = "git+https://github.com/TadaTeruki/drainage-basin-builder#58b74a2c1bf2f0348b4e8766332b77c6172a8508"
 dependencies = [
  "worley-particle",
 ]

@@ -1,6 +1,6 @@
 use std::{cell::RefCell, rc::Rc};
 
-use drainage_basin_builder::{build_drainage_basin, DrainageBasinNode};
+use drainage_basin_builder::{build_drainage_basin, DrainageBasinInput, DrainageBasinNode};
 use gtk4::{cairo::Context, prelude::WidgetExt, DrawingArea};
 use vislayers::{
     colormap::SimpleColorMap,
@@ -102,7 +102,20 @@ struct DrainageMap {
 
 impl DrainageMap {
     fn from_terrain_map(terrain_map: &TerrainMap) -> Self {
-        let particle_map = build_drainage_basin(&terrain_map.particle_map);
+        let particle_map_input = terrain_map
+            .particle_map
+            .iter()
+            .map(|(particle, elevation)| {
+                (
+                    *particle,
+                    DrainageBasinInput {
+                        elevation: *elevation,
+                    },
+                )
+            })
+            .collect::<ParticleMap<DrainageBasinInput>>();
+
+        let particle_map = build_drainage_basin(&particle_map_input);
 
         Self { particle_map }
     }
