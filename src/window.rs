@@ -22,6 +22,7 @@ pub struct Visualizer {
     window_width: i32,
     window_height: i32,
     layers: Vec<(Rc<RefCell<dyn Layer>>, usize)>,
+    background_color: (f64, f64, f64),
 }
 
 impl Visualizer {
@@ -34,6 +35,7 @@ impl Visualizer {
             window_width,
             window_height,
             app,
+            background_color: (50.0 / 255.0, 110.0 / 255.0, 150.0 / 255.0),
         }
     }
 
@@ -44,6 +46,10 @@ impl Visualizer {
     pub fn change_window_size(&mut self, width: i32, height: i32) {
         self.window_width = width;
         self.window_height = height;
+    }
+
+    pub fn change_background_color(&mut self, color: (f64, f64, f64)) {
+        self.background_color = color;
     }
 
     pub fn run(mut self) -> ExitCode {
@@ -69,7 +75,11 @@ impl Visualizer {
                     .map(|(layer, _)| Rc::clone(layer))
                     .collect::<Vec<_>>();
                 move |drawing_area, cr, _, _| {
-                    cr.set_source_rgb(50.0 / 255.0, 110.0 / 255.0, 150.0 / 255.0);
+                    cr.set_source_rgb(
+                        self.background_color.0,
+                        self.background_color.1,
+                        self.background_color.2,
+                    );
                     cr.paint().expect("Failed to paint background");
 
                     let mut view = view.borrow_mut();

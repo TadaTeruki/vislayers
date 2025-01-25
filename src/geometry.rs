@@ -24,13 +24,11 @@ impl Rect {
     }
 
     pub fn map_coord_x(&self, x: f64, map_min_x: f64, map_max_x: f64) -> f64 {
-        (map_min_x + ((x - self.min_x) / self.width()) * (map_max_x - map_min_x))
-            .clamp(map_min_x, map_max_x)
+        map_min_x + ((x - self.min_x) / self.width()) * (map_max_x - map_min_x)
     }
 
     pub fn map_coord_y(&self, y: f64, map_min_y: f64, map_max_y: f64) -> f64 {
-        (map_min_y + ((y - self.min_y) / self.height()) * (map_max_y - map_min_y))
-            .clamp(map_min_y, map_max_y)
+        map_min_y + ((y - self.min_y) / self.height()) * (map_max_y - map_min_y)
     }
 }
 
