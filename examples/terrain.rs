@@ -1,7 +1,5 @@
-use std::{cell::RefCell, rc::Rc};
-
-use drainage_basin_builder::{build_drainage_basin, DrainageBasinInput, DrainageBasinNode};
 use gtk4::{cairo::Context, prelude::WidgetExt, DrawingArea};
+use std::{cell::RefCell, rc::Rc};
 use vislayers::{
     colormap::SimpleColorMap,
     geometry::FocusRange,
@@ -10,7 +8,6 @@ use vislayers::{
 use worley_particle::map::{Band, IDWStrategy, InterpolationMethod, ParticleMap};
 
 struct TerrainMap {
-    particle_map: ParticleMap<f64>,
     bands: Vec<Band>,
 }
 
@@ -34,10 +31,7 @@ impl TerrainMap {
             )
             .expect("Error generating bands");
 
-        Self {
-            particle_map,
-            bands,
-        }
+        Self { bands }
     }
 }
 
@@ -96,78 +90,10 @@ impl Layer for TerrainMap {
     }
 }
 
-struct DrainageMap {
-    particle_map: ParticleMap<DrainageBasinNode>,
-}
-
-impl DrainageMap {
-    fn from_terrain_map(terrain_map: &TerrainMap) -> Self {
-        let particle_map_input = terrain_map
-            .particle_map
-            .iter()
-            .map(|(particle, elevation)| {
-                (
-                    *particle,
-                    DrainageBasinInput {
-                        elevation: *elevation,
-                    },
-                )
-            })
-            .collect::<ParticleMap<DrainageBasinInput>>();
-
-        let particle_map = build_drainage_basin(&particle_map_input);
-
-        Self { particle_map }
-    }
-}
-
-impl Layer for DrainageMap {
-    fn draw(&self, drawing_area: &DrawingArea, cr: &Context, focus_range: &FocusRange) {
-        let area_width = drawing_area.width();
-        let area_height = drawing_area.height();
-
-        let rect = focus_range.to_rect(area_width as f64, area_height as f64);
-
-        for (particle, node) in self.particle_map.iter() {
-            let site_from = particle.site();
-            let site_to = node.flow_to.site();
-
-            let x1 = rect.map_coord_x(site_from.0, 0.0, area_width as f64);
-            let y1 = rect.map_coord_y(site_from.1, 0.0, area_height as f64);
-            let x2 = rect.map_coord_x(site_to.0, 0.0, area_width as f64);
-            let y2 = rect.map_coord_y(site_to.1, 0.0, area_height as f64);
-
-            if *particle == node.flow_to {
-                cr.set_source_rgb(1.0, 0.0, 1.0);
-                cr.arc(x1, y1, 1.0, 0.0, 2.0 * std::f64::consts::PI);
-                cr.fill().expect("Failed to draw center point");
-            } else {
-                let site_second_to = self
-                    .particle_map
-                    .get(&node.flow_to)
-                    .unwrap_or(&node)
-                    .flow_to
-                    .site();
-                let x3 = rect.map_coord_x(site_second_to.0, 0.0, area_width as f64);
-                let y3 = rect.map_coord_y(site_second_to.1, 0.0, area_height as f64);
-
-                cr.set_line_width(node.river_width(1.0) / focus_range.radius());
-                cr.set_source_rgb(0.0, 0.0, 1.0);
-                cr.move_to((x1 + x2) / 2.0, (y1 + y2) / 2.0);
-                cr.line_to((x2 + x3) / 2.0, (y2 + y3) / 2.0);
-                cr.set_line_cap(gtk4::cairo::LineCap::Round);
-                cr.stroke().expect("Failed to draw edge");
-            }
-        }
-    }
-}
-
 fn main() {
     let terrain_map = TerrainMap::new("./data/11008264925851530191.particlemap", 0.0025);
-    let drainage_map = DrainageMap::from_terrain_map(&terrain_map);
 
     let mut visualizer = Visualizer::new(800, 600);
     visualizer.add_layer(Rc::new(RefCell::new(terrain_map)), 0);
-    visualizer.add_layer(Rc::new(RefCell::new(drainage_map)), 1);
     visualizer.run();
 }

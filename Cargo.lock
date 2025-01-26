@@ -102,14 +102,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "drainage-basin-builder"
-version = "0.1.0"
-source = "git+https://github.com/TadaTeruki/drainage-basin-builder#17b84238ad37f3509adbb8c0ae50d77de35581b9"
-dependencies = [
- "worley-particle",
-]
-
-[[package]]
 name = "either"
 version = "1.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -985,7 +977,6 @@ checksum = "852e951cb7832cb45cb1169900d19760cfa39b82bc0ea9c0e5a14ae88411c98b"
 name = "vislayers"
 version = "0.1.0"
 dependencies = [
- "drainage-basin-builder",
  "gtk4",
  "worley-particle",
 ]
