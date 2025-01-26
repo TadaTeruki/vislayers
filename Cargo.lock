@@ -1072,7 +1072,7 @@ dependencies = [
 [[package]]
 name = "worley-particle"
 version = "0.1.0"
-source = "git+https://github.com/TadaTeruki/worley-particle#dfe45f67404ede7a5ef3579f9de89ccacad394ce"
+source = "git+https://github.com/TadaTeruki/worley-particle#9a0247f802bd9b6594f9ebe7afac40633fff2a4b"
 dependencies = [
  "contour",
  "prost",
