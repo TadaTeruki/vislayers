@@ -5,7 +5,10 @@ use vislayers::{
     geometry::FocusRange,
     window::{Layer, Visualizer},
 };
-use worley_particle::map::{Band, IDWStrategy, InterpolationMethod, ParticleMap};
+use worley_particle::map::{
+    lerp::{vertorization::Band, IDWStrategy, InterpolationMethod},
+    ParticleMap,
+};
 
 struct TerrainMap {
     bands: Vec<Band>,
@@ -26,7 +29,7 @@ impl TerrainMap {
                 particle_map.corners(),
                 300000.0,
                 &thresholds,
-                &InterpolationMethod::IDW(IDWStrategy::default_from_params(particle_map.params())),
+                InterpolationMethod::IDW(IDWStrategy::default_from_params(particle_map.params())),
                 true,
             )
             .expect("Error generating bands");
