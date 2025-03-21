@@ -881,7 +881,7 @@ dependencies = [
 [[package]]
 name = "worley-particle"
 version = "0.1.0"
-source = "git+https://github.com/TadaTeruki/worley-particle#f5291423b1a0bcdf8961e13374300f228d12449e"
+source = "git+https://github.com/TadaTeruki/worley-particle#3152bcf2226783a14999dbfb3c870da90340fa42"
 dependencies = [
  "contour",
  "flatbuffers",
