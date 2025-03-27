@@ -6,8 +6,8 @@ use vislayers::{
     window::{Layer, Visualizer},
 };
 use worley_particle::map::{
-    lerp::{vertorization::Band, IDWStrategy, InterpolationMethod},
-    ParticleMap,
+    lerp::{vertorization::Band, InterpolationMethod},
+    IDWStrategy, ParticleMap,
 };
 
 struct TerrainMap {
